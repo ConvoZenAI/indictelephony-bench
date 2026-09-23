@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "IndicTelephony-Bench: An Open ASR Benchmark for Indian Telephone Speech"
+message: "If you use this benchmark, please cite it."
+type: dataset
+authors:
+  - family-names: Priyadarshi
+    given-names: Prasoon
+  - family-names: Abdul Azeez
+    given-names: Zaheer
+  - name: "ConvoZen AI"
+repository-code: "https://github.com/ConvoZenAI/indictelephony-bench"
+url: "https://huggingface.co/datasets/ConvoZenAI/indictelephony-bench"
+license: Apache-2.0
+version: 1.0.1
+date-released: "2026-09-21"
+keywords:
+  - automatic speech recognition
+  - benchmark
+  - telephony
+  - code-switching
+  - Indian languages
+abstract: >-
+  An open, telephony-only ASR benchmark of 25,393 human-curated utterances
+  (30.18 hours) in nine Indian languages, recorded over live SIP lines and
+  released at 8 kHz. 70.4% of utterances are code-mixed. This repository holds
+  the scoring suite: the normalizer, five metrics and call-level bootstrap
+  intervals.

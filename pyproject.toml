@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indictelephony-bench"
+version = "1.0.1"
+description = "Scoring for IndicTelephony-Bench: code-mixed Indian telephone speech ASR"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Prasoon Priyadarshi" },
+  { name = "Zaheer Abdul Azeez" },
+]
+keywords = ["asr", "speech-recognition", "benchmark", "code-switching",
+            "indian-languages", "telephony", "wer"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "jiwer>=3.0",
+  "pyarrow>=14.0",
+]
+
+[project.optional-dependencies]
+# pulling the released references from the hub
+hub = ["datasets>=2.18"]
+# semantic WER: script folding and fuzzy verification of judge proposals
+semantic = ["indic-transliteration>=2.3", "rapidfuzz>=3.0", "pydantic>=2.0"]
+# judge backends for semantic WER; pick one
+gemini = ["google-genai>=1.0"]
+openai = ["openai>=1.40"]
+# re-running a system, one extra per vendor so scoring never pulls an SDK
+akshara = ["convozen>=0.4.2,<0.5"]
+saaras = ["httpx>=0.27", "sarvamai>=0.1"]
+elevenlabs = ["elevenlabs>=1.0"]
+smallest = ["httpx>=0.27"]
+deepgram = ["httpx>=0.27"]
+dev = ["pytest>=7.0", "ruff>=0.6"]
+
+[project.urls]
+Dataset = "https://huggingface.co/datasets/ConvoZenAI/indictelephony-bench"
+
+[project.scripts]
+indictelephony-score = "indictelephony_bench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I", "UP", "B", "SIM", "RET", "ARG", "C4"]
+ignore = [
+  "E501",    # long lines: a table-shaped comment reads better than a wrapped one
+  "B008",    # argparse defaults built at call time are fine here
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The scoring normalizer produced every published number. Its behaviour is
+# frozen, so it is exempt from style-only rewrites: a cosmetic edit here carries
+# real risk and no benefit. Functional rules (F, B) still apply.
+"src/indictelephony_bench/normalize.py" = ["E702", "SIM103"]
+# Providers implement one interface, and each ignores the parameters its vendor
+# API cannot act on. That is the point of a shared signature, not dead code.
+"src/indictelephony_bench/providers/*" = ["ARG001", "ARG002", "SIM105", "PTH123", "E702"]
+# `language` and `threshold` are accepted for call-site compatibility and
+# documented as unused; dropping them would break callers for no gain.
+"src/indictelephony_bench/metrics/*" = ["ARG001", "SIM105", "E702"]
+# Per-provider blocks read better separated than collapsed into one condition.
+"src/indictelephony_bench/eligibility.py" = ["SIM102"]
+"scripts/*" = ["E402"]   # sys.path shim must precede the package imports
+"tests/*" = ["E402"]     # pytest.importorskip must precede the optional import
